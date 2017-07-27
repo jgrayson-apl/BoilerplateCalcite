@@ -240,7 +240,7 @@ define([
       //
 
       // LEFT PANE TOGGLE //
-      const toggleLeftPaneNode = domConstruct.create("div", { title: "Toggle Left Panel", className: "toggle-pane-node esri-icon-expand" });
+      const toggleLeftPaneNode = domConstruct.create("div", { title: "Toggle Left Panel", className: "esri-widget-button esri-icon-collapse" });
       view.ui.add(toggleLeftPaneNode, { position: "top-left", index: 0 });
       on(toggleLeftPaneNode, "click", function () {
         query(".ui-layout-left").toggleClass("hide");
