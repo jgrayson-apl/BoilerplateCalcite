@@ -81,6 +81,25 @@
       </nav>
     </div>
 
+    <!-- PRINT SIDE DRAWER -->
+    <div class="drawer drawer-left js-drawer" data-drawer="print-drawer" tabindex="0">
+      <nav class="drawer-nav" role="navigation">
+        <aside class="side-nav">
+          <h2 class="side-nav-title">Print Map</h2>
+          <div class="panel panel-white">
+            <div id="print-node"></div>
+          </div>
+          <!--<h2 class="side-nav-title">Social</h2>
+          <div class="text-center padding-leader-half">
+            <span class="icon-social-contact" aria-label="Email"></span>
+            <span class="icon-social-geonet" aria-label="GeoNet"></span>
+            <span class="icon-social-facebook" aria-label="Facebook"></span>
+            <span class="icon-social-twitter" aria-label="Twitter"></span>
+          </div>-->
+        </aside>
+      </nav>
+    </div>
+
     <!-- BODY WRAPPER -->
     <div class="wrapper">
 
@@ -90,7 +109,7 @@
           <div class="column-24">
 
             <!-- APP TITLE -->
-            <span id="app-title-node" class="top-nav-title"></span>
+            <span id="app-title-node" class="top-nav-title text-blue"></span>
 
             <!-- MAP AND CONTENT -->
             <nav class="top-nav-list" role="navigation" aria-labelledby="topnav">
@@ -114,6 +133,7 @@
 
             <!-- APP DETAILS -->
             <nav id="app-details-node" class="top-nav-list right" role="navigation">
+              <span class="top-nav-link icon-ui-printer margin-left-1 js-drawer-toggle esri-interactive" title="Print Map" data-drawer="print-drawer"></span>
               <a class="top-nav-link icon-ui-description margin-left-1 js-modal-toggle" data-modal="app-details-dialog" href="#"></a>
             </nav>
 
@@ -156,7 +176,7 @@
               <nav class="tab-nav">
                 <a class="tab-title is-active js-tab">Layers</a>
                 <a class="tab-title js-tab">Places</a>
-                <a class="tab-title js-tab">Print</a>
+                <a class="tab-title js-tab">Other</a>
               </nav>
               <section class="tab-contents">
                 <article class="tab-section js-tab-section is-active">
@@ -171,9 +191,7 @@
                 <article class="tab-section js-tab-section">
                   <div id="places-node" class="panel panel-white panel-no-border"></div>
                 </article>
-                <article class="tab-section js-tab-section">
-                  <div id="print-node"></div>
-                </article>
+                <article class="tab-section js-tab-section"></article>
               </section>
             </div>
           </div>

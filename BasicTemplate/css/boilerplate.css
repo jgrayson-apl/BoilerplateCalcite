@@ -60,6 +60,13 @@ body * {
   max-height : unset;
 }
 
+.drawer-nav {
+  width : 350px;
+}
+
+.drawer-left .drawer-nav {
+  left : -280px;
+}
 
 /* =========================================================== */
 
