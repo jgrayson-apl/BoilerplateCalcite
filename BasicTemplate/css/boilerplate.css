@@ -28,16 +28,12 @@ body * {
   vertical-align : middle;
 }
 
-#legend-node {
-  padding : 10px;
-}
-
 .esri-search__input {
   height : 32px !important;
 }
 
 .esri-layer-list {
-  background-color : #fff;
+  background-color : transparent;
   width            : unset;
   max-height       : unset;
 }
@@ -54,6 +50,10 @@ body * {
 .esri-layer-list__item-action-icon {
   height         : 100%;
   vertical-align : middle !important;
+}
+
+#legend-node {
+  padding : 10px;
 }
 
 .esri-print__container {
