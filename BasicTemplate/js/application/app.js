@@ -20,7 +20,8 @@ define([
   "dojo/i18n!./nls/resources",
   "dojo/_base/declare",
   "dojo/_base/lang",
-  "dojo/_base/array",
+  "dojo/_base/Color",
+  "dojo/colors",
   "dojo/number",
   "dojo/query",
   "dojo/on",
@@ -45,7 +46,7 @@ define([
   "esri/widgets/BasemapGallery",
   "esri/widgets/Expand",
   "dojo/domReady!"
-], function (calcite, ItemHelper, UrlParamHelper, i18n, declare, lang, array, number, query, on,
+], function (calcite, ItemHelper, UrlParamHelper, i18n, declare, lang, Color, colors, number, query, on,
              dom, domAttr, domClass, domGeom, domConstruct, ConfirmDialog,
              IdentityManager, watchUtils, promiseUtils, Portal, Layer,
              Home, Search, LayerList, Legend, Print, ScaleBar, Compass, BasemapGallery, Expand) {
@@ -235,136 +236,138 @@ define([
       // TITLE //
       document.title = dom.byId("app-title-node").innerHTML = this.config.title;
 
-      //
-      // WIDGETS IN VIEW UI //
-      //
-
-      // LEFT PANE TOGGLE //
-      const toggleLeftPaneNode = domConstruct.create("div", { title: "Toggle Left Panel", className: "esri-widget-button esri-icon-collapse" });
-      view.ui.add(toggleLeftPaneNode, { position: "top-left", index: 0 });
-      on(toggleLeftPaneNode, "click", function () {
-        query(".ui-layout-left").toggleClass("hide");
-        query(".ui-layout-center").toggleClass("column-18");
-        query(".ui-layout-center").toggleClass("column-24");
-        domClass.toggle(toggleLeftPaneNode, "esri-icon-collapse esri-icon-expand");
-      }.bind(this));
-
-      // HOME //
-      const homeWidget = new Home({ view: view });
-      view.ui.add(homeWidget, { position: "top-left", index: 1 });
-
-      // COMPASS //
-      if(view.type === "2d") {
-        const compass = new Compass({ view: view });
-        view.ui.add(compass, "top-left");
-      }
-
-      // SCALEBAR //
-      const scaleBar = new ScaleBar({ view: view, unit: "dual" });
-      view.ui.add(scaleBar, { position: "bottom-left" });
-
-      //
-      // WIDGETS IN EXPAND //
-      //
-
-      // SEARCH //
-      const searchWidget = new Search({
-        view: view,
-        container: domConstruct.create("div")
-      });
-      // EXPAND SEARCH //
-      const toolsExpand = new Expand({
-        view: view,
-        content: searchWidget.domNode,
-        expandIconClass: "esri-icon-search",
-        expandTooltip: "Search"
-      }, domConstruct.create("div"));
-      view.ui.add(toolsExpand, "top-right");
-
-      // BASEMAP GALLERY //
-      const basemapGallery = new BasemapGallery({
-        view: view,
-        container: domConstruct.create("div")
-      });
-      // EXPAND BASEMAP GALLERY //
-      const basemapGalleryExpand = new Expand({
-        view: view,
-        content: basemapGallery.domNode,
-        expandIconClass: "esri-icon-basemap",
-        expandTooltip: "Basemap"
-      }, domConstruct.create("div"));
-      view.ui.add(basemapGalleryExpand, "top-right");
-
-
-      //
-      // WIDGETS IN TAB PANES //
-      //
-
-      // LAYER LIST //
-      const layerList = new LayerList({
-        view: view,
-        createActionsFunction: function (evt) {
-          let item = evt.item;
-
-          let fullExtentAction = {
-            id: "full-extent",
-            title: "Go to full extent",
-            className: "esri-icon-zoom-out-fixed"
-          };
-
-          let informationAction = {
-            id: "information",
-            title: "Layer information",
-            className: "esri-icon-description"
-          };
-
-          let layerActions = [];
-          if(item.layer) {
-            layerActions.push(fullExtentAction);
-            if(item.layer.url) {
-              layerActions.push(informationAction);
-            }
-          }
-
-          return [layerActions];
-        }
-      }, "layer-list-node");
-      layerList.on("trigger-action", function (evt) {
-        //console.info(evt);
-
-        switch (evt.action.id) {
-          case "full-extent":
-            view.goTo(evt.item.layer.fullExtent);
-            break;
-          case "information":
-            window.open(evt.item.layer.url);
-            break;
-        }
-      }.bind(this));
-
-      // LEGEND
-      const legend = new Legend({ view: view }, "legend-node");
-
-      // PRINT //
-      const print = new Print({
-        view: view,
-        printServiceUrl: "//utility.arcgisonline.com/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task"
-      }, "print-node");
-      this.setPrintTitle = (title) => {
-        const printTitleInput = query(".esri-print__input-text")[0];
-        printTitleInput.value = title;
-        printTitleInput.dispatchEvent(new Event("input"));
-      };
-      this.setPrintTitle(this.config.title);
-
       // USER SIGN IN //
-      this.initializeUserSignIn(view);
+      this.initializeUserSignIn(view).then(() => {
 
-      // MAP DETAILS //
-      this.displayMapDetails(view);
+        //
+        // WIDGETS IN VIEW UI //
+        //
 
-      // INITIALIZE PLACES //
-      this.initializePlaces(view);
+        // LEFT PANE TOGGLE //
+        const toggleLeftPaneNode = domConstruct.create("div", { title: "Toggle Left Panel", className: "esri-widget-button esri-icon-collapse" });
+        view.ui.add(toggleLeftPaneNode, { position: "top-left", index: 0 });
+        on(toggleLeftPaneNode, "click", function () {
+          query(".ui-layout-left").toggleClass("hide");
+          query(".ui-layout-center").toggleClass("column-18");
+          query(".ui-layout-center").toggleClass("column-24");
+          domClass.toggle(toggleLeftPaneNode, "esri-icon-collapse esri-icon-expand");
+        }.bind(this));
+
+        // HOME //
+        const homeWidget = new Home({ view: view });
+        view.ui.add(homeWidget, { position: "top-left", index: 1 });
+
+        // COMPASS //
+        if(view.type === "2d") {
+          const compass = new Compass({ view: view });
+          view.ui.add(compass, "top-left");
+        }
+
+        // SCALEBAR //
+        const scaleBar = new ScaleBar({ view: view, unit: "dual" });
+        view.ui.add(scaleBar, { position: "bottom-left" });
+
+        //
+        // WIDGETS IN EXPAND //
+        //
+
+        // SEARCH //
+        const searchWidget = new Search({
+          view: view,
+          container: domConstruct.create("div")
+        });
+        // EXPAND SEARCH //
+        const toolsExpand = new Expand({
+          view: view,
+          content: searchWidget.domNode,
+          expandIconClass: "esri-icon-search",
+          expandTooltip: "Search"
+        }, domConstruct.create("div"));
+        view.ui.add(toolsExpand, "top-right");
+
+        // BASEMAP GALLERY //
+        const basemapGallery = new BasemapGallery({
+          view: view,
+          container: domConstruct.create("div")
+        });
+        // EXPAND BASEMAP GALLERY //
+        const basemapGalleryExpand = new Expand({
+          view: view,
+          content: basemapGallery.domNode,
+          expandIconClass: "esri-icon-basemap",
+          expandTooltip: "Basemap"
+        }, domConstruct.create("div"));
+        view.ui.add(basemapGalleryExpand, "top-right");
+
+        //
+        // WIDGETS IN TAB PANES //
+        //
+
+        // LAYER LIST //
+        const layerList = new LayerList({
+          view: view,
+          createActionsFunction: function (evt) {
+            let item = evt.item;
+
+            let fullExtentAction = {
+              id: "full-extent",
+              title: "Go to full extent",
+              className: "esri-icon-zoom-out-fixed"
+            };
+
+            let informationAction = {
+              id: "information",
+              title: "Layer information",
+              className: "esri-icon-description"
+            };
+
+            let layerActions = [];
+            if(item.layer) {
+              layerActions.push(fullExtentAction);
+              if(item.layer.url) {
+                layerActions.push(informationAction);
+              }
+            }
+
+            return [layerActions];
+          }
+        }, "layer-list-node");
+        layerList.on("trigger-action", function (evt) {
+          //console.info(evt);
+
+          switch (evt.action.id) {
+            case "full-extent":
+              view.goTo(evt.item.layer.fullExtent);
+              break;
+            case "information":
+              window.open(evt.item.layer.url);
+              break;
+          }
+        }.bind(this));
+
+        // LEGEND
+        const legend = new Legend({ view: view }, "legend-node");
+
+        // PRINT //
+        const print = new Print({
+          view: view,
+          printServiceUrl: "//utility.arcgisonline.com/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task"
+        }, "print-node");
+        this.setPrintTitle = (title) => {
+          const printTitleInput = query(".esri-print__input-text")[0];
+          printTitleInput.value = title;
+          printTitleInput.dispatchEvent(new Event("input"));
+        };
+        this.setPrintTitle(this.config.title);
+
+        // MAP DETAILS //
+        this.displayMapDetails(view);
+
+        // INITIALIZE PLACES //
+        this.initializePlaces(view);
+
+      });
+
 
     },
 
@@ -381,7 +384,7 @@ define([
       // SIGN IN //
       let userSignIn = () => {
         this.portal = new Portal({ authMode: "immediate" });
-        this.portal.load().then(() => {
+        return this.portal.load().then(() => {
           //console.info(this.portal, this.portal.user);
 
           dom.byId("user-firstname-node").innerHTML = this.portal.user.fullName.split(" ")[0];
@@ -419,9 +422,9 @@ define([
 
       // PORTAL //
       this.portal = new Portal({});
-      this.portal.load().then(() => {
+      return this.portal.load().then(() => {
         // CHECK THE SIGN IN STATUS WHEN APP LOADS //
-        IdentityManager.checkSignInStatus(this.portal.url).then(userSignIn);
+        return IdentityManager.checkSignInStatus(this.portal.url).then(userSignIn);
       }).otherwise(console.warn);
     },
 
