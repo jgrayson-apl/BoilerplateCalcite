@@ -236,6 +236,9 @@ define([
       // TITLE //
       document.title = dom.byId("app-title-node").innerHTML = this.config.title;
 
+      // MAP DETAILS //
+      this.displayMapDetails(view);
+
       // USER SIGN IN //
       this.initializeUserSignIn(view).then(() => {
 
@@ -348,20 +351,23 @@ define([
         // LEGEND
         const legend = new Legend({ view: view }, "legend-node");
 
-        // PRINT //
-        const print = new Print({
-          view: view,
-          printServiceUrl: "//utility.arcgisonline.com/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task"
-        }, "print-node");
-        this.setPrintTitle = (title) => {
-          const printTitleInput = query(".esri-print__input-text")[0];
-          printTitleInput.value = title;
-          printTitleInput.dispatchEvent(new Event("input"));
-        };
-        this.setPrintTitle(this.config.title);
 
-        // MAP DETAILS //
-        this.displayMapDetails(view);
+        // PRINT //
+        const printServiceUrl = this.config.helperServices.printTask.url;
+        if((view.type === "2d") && (printServiceUrl && (printServiceUrl.length > 0))) {
+          const print = new Print({
+            view: view,
+            printServiceUrl: printServiceUrl
+          }, "print-node");
+          this.setPrintTitle = (title) => {
+            const printTitleInput = query(".esri-print__input-text")[0];
+            printTitleInput.value = title;
+            printTitleInput.dispatchEvent(new Event("input"));
+          };
+          this.setPrintTitle(this.config.title);
+        } else {
+          domClass.add("print-action-node", "hide");
+        }
 
         // INITIALIZE PLACES //
         this.initializePlaces(view);
@@ -444,12 +450,17 @@ define([
       dom.byId("current-map-card-caption").innerHTML = lang.replace("A map by {owner}", item);
       dom.byId("current-map-card-caption").title = "Last modified on " + itemLastModifiedDate;
       dom.byId("current-map-card-title").innerHTML = item.title;
-      dom.byId("current-map-card-title").href = lang.replace("//{urlKey}.{customBaseUrl}/home/item.html?id={id}", {
-        urlKey: portal ? portal.urlKey : "www",
-        customBaseUrl: portal ? portal.customBaseUrl : "arcgis.com",
+      dom.byId("current-map-card-description").innerHTML = item.description;
+
+      dom.byId("current-map-card-title").href = lang.replace("{url}/home/item.html?id={id}", {
+        url: portal ? (portal.urlKey ? `https://${portal.urlKey}.${portal.customBaseUrl}` : portal.url) : "https://www.arcgis.com",
         id: item.id
       });
-      dom.byId("current-map-card-description").innerHTML = item.description;
+      /*dom.byId("current-map-card-title").href = lang.replace("//{urlKey}.{customBaseUrl}/home/item.html?id={id}", {
+       urlKey: portal ? portal.urlKey : "www",
+       customBaseUrl: portal ? portal.customBaseUrl : "arcgis.com",
+       id: item.id
+       });*/
 
     },
 
