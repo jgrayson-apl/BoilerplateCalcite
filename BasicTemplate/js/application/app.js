@@ -19,7 +19,6 @@ define([
   "boilerplate/UrlParamHelper",
   "dojo/i18n!./nls/resources",
   "dojo/_base/declare",
-  "dojo/_base/lang",
   "dojo/_base/Color",
   "dojo/colors",
   "dojo/number",
@@ -30,7 +29,6 @@ define([
   "dojo/dom-class",
   "dojo/dom-geometry",
   "dojo/dom-construct",
-  "dijit/ConfirmDialog",
   "esri/identity/IdentityManager",
   "esri/core/watchUtils",
   "esri/core/promiseUtils",
@@ -44,10 +42,9 @@ define([
   "esri/widgets/ScaleBar",
   "esri/widgets/Compass",
   "esri/widgets/BasemapGallery",
-  "esri/widgets/Expand",
-  "dojo/domReady!"
-], function (calcite, ItemHelper, UrlParamHelper, i18n, declare, lang, Color, colors, number, query, on,
-             dom, domAttr, domClass, domGeom, domConstruct, ConfirmDialog,
+  "esri/widgets/Expand"
+], function (calcite, ItemHelper, UrlParamHelper, i18n, declare, Color, colors, number, query, on,
+             dom, domAttr, domClass, domGeom, domConstruct,
              IdentityManager, watchUtils, promiseUtils, Portal, Layer,
              Home, Search, LayerList, Legend, Print, ScaleBar, Compass, BasemapGallery, Expand) {
 
@@ -59,7 +56,7 @@ define([
     /**
      *
      */
-    constructor() {
+    constructor: function () {
       calcite.init();
     },
 
@@ -148,7 +145,7 @@ define([
           this.config.title = map.portalItem.title;
         }
 
-        lang.mixin(viewProperties, this.urlParamHelper.getViewProperties(this.config));
+        viewProperties = { ...viewProperties, ...this.urlParamHelper.getViewProperties(this.config) };
         require(["esri/views/MapView"], function (MapView) {
 
           let view = new MapView(viewProperties);
@@ -178,7 +175,7 @@ define([
           this.config.title = map.portalItem.title;
         }
 
-        lang.mixin(viewProperties, this.urlParamHelper.getViewProperties(this.config));
+        viewProperties = { ...viewProperties, ...this.urlParamHelper.getViewProperties(this.config) };
         require(["esri/views/SceneView"], function (SceneView) {
 
           let view = new SceneView(viewProperties);
@@ -447,20 +444,13 @@ define([
 
       dom.byId("current-map-card-thumb").src = item.thumbnailUrl;
       dom.byId("current-map-card-thumb").alt = item.title;
-      dom.byId("current-map-card-caption").innerHTML = lang.replace("A map by {owner}", item);
+      dom.byId("current-map-card-caption").innerHTML = `A map by ${item.owner}`;
       dom.byId("current-map-card-caption").title = "Last modified on " + itemLastModifiedDate;
       dom.byId("current-map-card-title").innerHTML = item.title;
       dom.byId("current-map-card-description").innerHTML = item.description;
 
-      dom.byId("current-map-card-title").href = lang.replace("{url}/home/item.html?id={id}", {
-        url: portal ? (portal.urlKey ? `https://${portal.urlKey}.${portal.customBaseUrl}` : portal.url) : "https://www.arcgis.com",
-        id: item.id
-      });
-      /*dom.byId("current-map-card-title").href = lang.replace("//{urlKey}.{customBaseUrl}/home/item.html?id={id}", {
-       urlKey: portal ? portal.urlKey : "www",
-       customBaseUrl: portal ? portal.customBaseUrl : "arcgis.com",
-       id: item.id
-       });*/
+      const portalUrl = portal ? (portal.urlKey ? `https://${portal.urlKey}.${portal.customBaseUrl}` : portal.url) : "https://www.arcgis.com";
+      dom.byId("current-map-card-title").href = `${portalUrl}/home/item.html?id=${item.id}`;
 
     },
 

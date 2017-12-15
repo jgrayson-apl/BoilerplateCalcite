@@ -4,6 +4,7 @@ html {
   -webkit-text-size-adjust : 100%;
   -moz-text-size-adjust    : 100%;
   -ms-text-size-adjust     : 100%;
+  overflow                 : auto;
 }
 
 body {
@@ -68,6 +69,10 @@ body * {
   left : -280px;
 }
 
+.input-error-message.is-active {
+  position : absolute;
+}
+
 /* =========================================================== */
 
 .places-node {
@@ -99,3 +104,4 @@ body * {
 }
 
 /* =========================================================== */
+
